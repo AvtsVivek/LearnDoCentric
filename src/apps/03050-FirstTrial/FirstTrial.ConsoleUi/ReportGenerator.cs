@@ -1,7 +1,7 @@
 ﻿using Docentric.Documents.ObjectModel;
 using Docentric.Documents.Reporting;
 using FirstTrial.Models;
-// using FirstTrial.ConsoleUi.Models;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace FirstTrial.ConsoleUi
@@ -22,6 +22,16 @@ namespace FirstTrial.ConsoleUi
                 return tempPath;
             }
         }
+
+        public string TemplateFileNameTwo
+        {
+            get
+            {
+                var tempPath = Path.Combine(ApplicationPath, "FirstTemplateTwo.docx");
+                return tempPath;
+            }
+        }
+
         protected string ApplicationPath
         {
             get
@@ -50,6 +60,8 @@ namespace FirstTrial.ConsoleUi
             var customer = new Customer() { 
                 Id = 1, FirstName = "Vivek", LastName = "Koppula", 
                 JobTitle = "Developer", Company = "Yoo Enterprises",
+                EmailAddress = "VIvek@HErewego.com",
+                MobilePhone = "1234567890",
                 Address = new Address { City = "Pune", Country = "India", PostalCode = "411111" }
             };
 
@@ -59,11 +71,16 @@ namespace FirstTrial.ConsoleUi
             using (Stream reportDocumentStream = File.Create(reportDocumentFileName))
             {
                 // Open the report template file.
-                using (Stream reportTemplateStream = GetReportTemplate())
+                using (Stream reportTemplateStream = GetReportTwoTemplate())
                 {
                     // Generate the report document using 'DocumentGenerator'.
                     var documentGenerator = new DocumentGenerator(customer);
-                    var documentGenerationResult = documentGenerator.GenerateDocument(reportTemplateStream, reportDocumentStream, SaveOptions);
+
+                    var documentGenerationResult = documentGenerator.GenerateDocument(
+                        reportTemplateStream, 
+                        reportDocumentStream, 
+                        SaveOptions);
+
                     if (documentGenerationResult.HasErrors)
                     {
                         foreach (Error error in documentGenerationResult.Errors)
@@ -71,6 +88,7 @@ namespace FirstTrial.ConsoleUi
                     }
 
                     Console.WriteLine($"File created at {reportDocumentFileName}");
+                    OpenWindowsExplorerAtGivenPath(reportDocumentFileName);
                     Console.WriteLine("Take a look at that !!!");
 
                 }
@@ -86,6 +104,29 @@ namespace FirstTrial.ConsoleUi
                 throw new Exception(string.Format("Report template '{0}' is not found", TemplateFileName));
             }
             return File.Open(TemplateFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        }
+
+        protected Stream GetReportTwoTemplate()
+        {
+            if (!File.Exists(TemplateFileNameTwo))
+            {
+                throw new Exception(string.Format("Report template '{0}' is not found", TemplateFileNameTwo));
+            }
+            return File.Open(TemplateFileNameTwo, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        }
+
+
+        private void OpenWindowsExplorerAtGivenPath(string path)
+        {
+            var directoryPath = Path.GetDirectoryName(path);
+            if (!Directory.Exists(directoryPath))
+            {
+                Console.WriteLine($"The given path {path} does not exist.");
+            }
+            else
+            {
+                Process.Start("explorer.exe", Path.GetDirectoryName(path!));
+            }
         }
     }
 }

@@ -13,11 +13,11 @@ reportGenerator.HelpTopicPage = "Examples_SimpleValueTemplating";
 var reportDocumentFileName = reportGenerator.GenerateReport();
 
 // Show it.
-var process = new Process();
-
-process.StartInfo = new ProcessStartInfo(reportDocumentFileName)
+var process = new Process()
 {
-    UseShellExecute = true
+    StartInfo = new ProcessStartInfo(reportDocumentFileName) {
+        UseShellExecute = true,
+    }
 };
 
 process.Start();
